@@ -2,53 +2,63 @@
 # By Makenzie Spurling, Josh Sample, and Kathryn Villarreal
 import numpy as np
 import pandas as pd
-
-sse = 0
+import random
+import matplotlib.pyplot as plt
 
 # find distance between points
 def euclidean_distance(point1, point2):
-    total = 0
-    for i in range(3):
-        total += np.sqrt(np.sum(np.square(point1[i+4]-point2[i+4])))
-    return total
+    return(sum((point1 - point2) ** 2)) ** 0.5
 
-# select random centroids based on number of clusters
-def init_centroids(k, df):
-    return df.sample(n = k)
+# assign points by closest centroid
+def findClosestCentroids(ic, X):
+    assigned_centroid = []
+    for i in X:
+        distance=[]
+        for j in ic:
+            distance.append(euclidean_distance(i, j))
+        assigned_centroid.append(np.argmin(distance))
+    return assigned_centroid
 
-# method for seeing if there was improvement
-def sum_of_squared_errors(k, n, clusteredPoints, centroids):
-    sse = 0
-    for i in range(k):
-        for j in range(n):
-            if clusteredPoints[i][j] != 0:
-                sse += euclidean_distance(clusteredPoints[i][j], centroids.iloc[i])
-    return sse
+# calculate centroids by finding mean of points 
+def calc_centroids(clusters, X):
+    new_centroids = []
+    new_df = pd.concat([pd.DataFrame(X), pd.DataFrame(clusters, columns=['cluster'])],
+                      axis=1)
+    for c in set(new_df['cluster']):
+        current_cluster = new_df[new_df['cluster'] == c][new_df.columns[:-1]]
+        cluster_mean = current_cluster.mean(axis=0)
+        new_centroids.append(cluster_mean)
+    return new_centroids
+
+# output clustered data to Excel
+def output_data(clusters, X):
+    new_df = pd.concat([pd.DataFrame(X), pd.DataFrame(clusters, columns=['cluster'])],
+                      axis=1)
+    new_df.to_excel("kmeans.xls")
 
 # clustering algorithm
 def kmeans(k, n, iterations, df):
-    centroids = init_centroids(k, df)
+    # create array from data
+    X = df[["sch9/wt", "ras2/wt", "tor1/wt"]].to_numpy()
+    # randomly choose centroids
+    init_centroids = random.sample(range(0, n), k)
+    centroids = []
+    for i in init_centroids:
+        centroids.append(X[i])
     # iterate until no more improvement
     for i in range(iterations):
-        clusteredPoints = [[0 for x in range(k)] for y in range(n)]
-        # assign points to clusters
-        for index, row in df.iterrows():
-            min = 2
-            for j in range(k):
-                distance = euclidean_distance(row, centroids.iloc[j])
-                if distance < min:
-                    min = distance
-                    closest = j
-            clusteredPoints[closest][index] = row
-        sse1 = sse
-        sse2 = sum_of_squared_errors(k, n, clusteredPoints, centroids)
-        if (sse1 - sse2) / sse1 < 0.0001:
+        old_centroids = centroids
+        # assign the points to a centroid
+        get_centroids = findClosestCentroids(centroids, X)
+        # calculate new centroids
+        centroids = calc_centroids(get_centroids, X)
+        # when the centroids don't change, the algorithm has converged
+        if np.array_equal(centroids, old_centroids):
+            output_data(get_centroids, X)
             break
-    pass
 
-
-
-
+    
+# driver, need dataset, k, and i
 if __name__ == "__main__":
     # create dataframe from dataset
     df = pd.read_excel("output.xls")
