@@ -3,7 +3,6 @@
 import numpy as np
 import pandas as pd
 import random
-import matplotlib.pyplot as plt
 
 # find distance between points
 def euclidean_distance(point1, point2):
