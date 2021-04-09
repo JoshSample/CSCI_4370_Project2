@@ -9,11 +9,11 @@ def euclidean_distance(point1, point2):
     return(sum((point1 - point2) ** 2)) ** 0.5
 
 # assign points by closest centroid
-def findClosestCentroids(ic, X):
+def assign_points(centroid, X):
     assigned_centroid = []
     for i in X:
         distance=[]
-        for j in ic:
+        for j in centroid:
             distance.append(euclidean_distance(i, j))
         assigned_centroid.append(np.argmin(distance))
     return assigned_centroid
@@ -21,8 +21,7 @@ def findClosestCentroids(ic, X):
 # calculate centroids by finding mean of points 
 def calc_centroids(clusters, X):
     new_centroids = []
-    new_df = pd.concat([pd.DataFrame(X), pd.DataFrame(clusters, columns=['cluster'])],
-                      axis=1)
+    new_df = pd.concat([pd.DataFrame(X), pd.DataFrame(clusters, columns=['cluster'])], axis=1)
     for c in set(new_df['cluster']):
         current_cluster = new_df[new_df['cluster'] == c][new_df.columns[:-1]]
         cluster_mean = current_cluster.mean(axis=0)
@@ -31,8 +30,7 @@ def calc_centroids(clusters, X):
 
 # output clustered data to Excel
 def output_data(clusters, X):
-    new_df = pd.concat([pd.DataFrame(X), pd.DataFrame(clusters, columns=['cluster'])],
-                      axis=1)
+    new_df = pd.concat([pd.DataFrame(X), pd.DataFrame(clusters, columns=['cluster'])], axis=1)
     new_df.to_excel("kmeans.xls")
 
 # clustering algorithm
@@ -48,7 +46,7 @@ def kmeans(k, n, iterations, df):
     for i in range(iterations):
         old_centroids = centroids
         # assign the points to a centroid
-        get_centroids = findClosestCentroids(centroids, X)
+        get_centroids = assign_points(centroids, X)
         # calculate new centroids
         centroids = calc_centroids(get_centroids, X)
         # when the centroids don't change, the algorithm has converged
@@ -57,7 +55,7 @@ def kmeans(k, n, iterations, df):
             break
 
     
-# driver, need dataset, k, and i
+# driver: need dataset, k, and i
 if __name__ == "__main__":
     # create dataframe from dataset
     df = pd.read_excel("output.xls")
