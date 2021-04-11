@@ -29,14 +29,12 @@ def calc_centroids(clusters, X):
     return new_centroids
 
 # output clustered data to Excel
-def output_data(clusters, X):
+def output_data(clusters, X, k):
     new_df = pd.concat([pd.DataFrame(X), pd.DataFrame(clusters, columns=['cluster'])], axis=1)
-    new_df.to_excel("kmeans.xls")
+    new_df.to_excel("kmeans with " + str(k) + " clusters.xls")
 
 # clustering algorithm
-def kmeans(k, n, iterations, df):
-    # create array from data
-    X = df[["sch9/wt", "ras2/wt", "tor1/wt"]].to_numpy()
+def kmeans(k, n, iterations, X):
     # randomly choose centroids
     init_centroids = random.sample(range(0, n), k)
     centroids = []
@@ -51,7 +49,7 @@ def kmeans(k, n, iterations, df):
         centroids = calc_centroids(get_centroids, X)
         # when the centroids don't change, the algorithm has converged
         if np.array_equal(centroids, old_centroids):
-            output_data(get_centroids, X)
+            output_data(get_centroids, X, k)
             break
 
     
@@ -59,6 +57,8 @@ def kmeans(k, n, iterations, df):
 if __name__ == "__main__":
     # create dataframe from dataset
     df = pd.read_excel("output.xls")
+    # create array from data
+    X = df[["sch9/wt", "ras2/wt", "tor1/wt"]].to_numpy()
     # number of clusters
     k = 3
     # number of objects
@@ -66,4 +66,4 @@ if __name__ == "__main__":
     # number of iterations 
     i = 100
     # pass data to algorithm
-    kmeans(k, n, i, df)
+    kmeans(k, n, i, X)
