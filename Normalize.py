@@ -18,7 +18,7 @@ def normal(df):
     df['ras2/wt'] = df['ras2/wt'].apply(calc, args=(col2Min, col2Max))  # Column 2
     df['tor1/wt'] = df['tor1/wt'].apply(calc, args=(col3Min, col3Max))  # Column 3
 
-    return df;
+    return df
 
 
 def calc(colVal, min, max):
@@ -27,7 +27,7 @@ def calc(colVal, min, max):
 
 if __name__ == "__main__":
     # Load the dataset
-    dataset = pd.read_excel("Longotor1delta.xls")
+    dataset = pd.read_excel("filtered_data.xls")
 
-    new_df = normal(dataset);
-    new_df.to_excel("output.xls")
+    new_df = normal(dataset)
+    new_df.to_excel("filtered_output.xls")

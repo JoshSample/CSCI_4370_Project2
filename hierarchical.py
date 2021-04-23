@@ -1,5 +1,5 @@
-# Kathryn Villarreal
-# Heirarchial Clustering
+# Data Mining Project 2: Hierachical Clustering
+# By Makenzie Spurling, Josh Sample, and Kathryn Villarreal
 
 import pandas as pd
 import collections
@@ -75,8 +75,7 @@ def write_to_excel(num_clusters, clusters, df, file_name):
     output.to_excel(file_name)
 
 if __name__ == "__main__":
-    df = pd.read_excel("output.xls")
-    num_clusters = input("How many clusters would you like?  ")
+    df = pd.read_excel("filtered_output.xls")
+    num_clusters = 3
     clusters = heir(df, num_clusters)
-    print(clusters)
-    write_to_excel(num_clusters, clusters, df, "h_3_clusters.xlsx")
+    write_to_excel(num_clusters, clusters, df, "filtered_h_3_clusters.xlsx")
